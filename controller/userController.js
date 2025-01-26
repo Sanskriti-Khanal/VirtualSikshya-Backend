@@ -1,0 +1,65 @@
+const { User } = require('../models');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+
+const userController = {
+  register: async (req, res) => {
+    try {
+      const { username, password, role, email } = req.body;
+      const hashedPassword = await bcrypt.hash(password, 10);
+
+      const user = await User.create({
+        username,
+        password: hashedPassword,
+        role,
+        email,
+      });
+
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  login: async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const user = await User.findOne({ where: { username } });
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const isValidPassword = await bcrypt.compare(password, user.password);
+      if (!isValidPassword) {
+        return res.status(401).json({ error: 'Invalid password' });
+      }
+
+      const token = jwt.sign({ id: user.id, role: user.role }, 'your_secret_key', {
+        expiresIn: '1h',
+      });
+
+      res.json({ token });
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+
+  getProfile: async (req, res) => {
+    try {
+      const user = await User.findByPk(req.user.id, {
+        attributes: { exclude: ['password'] }, // Exclude password from the response
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
+    }
+  },
+};
+
+module.exports = userController;
