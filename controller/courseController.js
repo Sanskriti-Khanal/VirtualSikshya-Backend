@@ -1,5 +1,7 @@
-const { Course, Teacher } = require('../models');
+// const { Course, Teacher } = require('../model');
 
+const Course = require('../model/Course')
+const Teacher = require('../model/Teacher')
 const courseController = {
   create: async (req, res) => {
     try {

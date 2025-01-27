@@ -1,7 +1,9 @@
-const { Teacher, User } = require('../models');
+//const { Teacher, User } = require('../model');
+const Teacher = require('../model/Teacher')
+const User = require('../model/User')
 
 const teacherController = {
-  create: async (req, res) => {
+  create: async (req, res, next) => {
     try {
       const { userId, name, employeeId, department, designation } = req.body;
 

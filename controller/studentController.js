@@ -1,4 +1,6 @@
-const { Student, User } = require('../models');
+//const { Student, User } = require('../model');
+const Student = require('../model/Student')
+const User = require('../model/User')
 
 const studentController = {
   create: async (req, res) => {

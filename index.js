@@ -1,7 +1,7 @@
 const express = require('express');
 const sequelize = require('./database/virtual_sikshya_db');
 const authRoutes = require('./routes/authRoutes');
-const userRoutes = require('./routes/userRoutes');
+const userRoutes = require('./routes/userRoute');
 const studentRoutes = require('./routes/studentRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 const courseRoutes = require('./routes/courseRoutes');
@@ -14,8 +14,8 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/users', userRoutes);
-app.use('/students', studentRoutes);
-app.use('/teachers', teacherRoutes);
+app.use('/students', studentRoutes);//
+app.use('/teachers', teacherRoutes);//
 app.use('/courses', courseRoutes);
 
 // Sync Sequelize models with the database
