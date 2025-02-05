@@ -6,7 +6,7 @@ const User = require("./model/User");
 const userRoutes = require("./routes/userRoutes");
 // const routineRoutes = require("./routes/routineRoutes");
 
-
+const app = express();
 // Middleware to parse JSON bodies
 app.use(cors());
 app.use(express.json());
