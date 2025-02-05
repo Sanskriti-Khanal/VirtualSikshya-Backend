@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database/virtual_sikshya_db');
+const sequelize = require('../database/connection');
 const Teacher = require('./Teacher');
 
 const Course = sequelize.define('Course', {

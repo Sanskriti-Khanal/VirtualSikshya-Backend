@@ -21,7 +21,7 @@ const teacherController = {
     }
   },
 
-  getProfile: async (req, res) => {
+  getProfile: async (req, res,next) => {
     try {
       const { userId } = req.params;
 

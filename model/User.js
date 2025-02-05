@@ -1,5 +1,5 @@
 const { DataTypes } = require('sequelize');
-const sequelize = require('../database/virtual_sikshya_db');
+const sequelize = require('../database/connection');
 
 const User = sequelize.define('User', {
   id: {
@@ -17,8 +17,9 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   role: {
-    type: DataTypes.ENUM('guest', 'admin', 'student', 'teacher'),
+    type: DataTypes.ENUM('GUEST', 'ADMIN', 'STUDENT', 'TEACHER'),
     allowNull: false,
+    defaultValue: 'STUDENT',
   },
   email: {
     type: DataTypes.STRING,
