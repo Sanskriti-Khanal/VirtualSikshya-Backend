@@ -1,12 +1,16 @@
-const { Sequelize } = require('sequelize');
 require("dotenv").config();
+const { Sequelize } = require("sequelize");
 
-// Initialize Sequelize with database credentials
-const sequelize = new Sequelize(process.env.DB_NAME, process.env.DB_USER, process.env.DB_PASSWORD, {
-  host: process.env.DB_HOST,
-  dialect: process.env.DB_DIALECT, // PostgreSQL
-  logging: false, // Set to true to log SQL queries
-});
+
+
+
+  const sequelize = new Sequelize("virtual_sikskya_db", "postgres", "admin123", {
+    host: "localhost",
+    port: 5432,
+    dialect: "postgres",
+    logging: false,
+  });
+  
 // Test the database connection
 async function testConnection() {
   try {
