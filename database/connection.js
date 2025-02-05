@@ -3,13 +3,17 @@ const { Sequelize } = require("sequelize");
 
 
 
-
-  const sequelize = new Sequelize("virtual_sikskya_db", "postgres", "admin123", {
-    host: "localhost",
-    port: 5432,
+const sequelize = new Sequelize(
+  process.env.DB_NAME,  // Database name
+  process.env.DB_USER,  // Database username
+  process.env.DB_PASS,  // Database password
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     dialect: "postgres",
-    logging: false,
-  });
+    logging: false, // Set to true if you want SQL logs in the console
+  }
+);
   
 // Test the database connection
 async function testConnection() {
