@@ -1,9 +1,14 @@
 const express = require("express");
-const { registerUser, loginUser, getUserProfile } = require("../controllers/userController");
 const { body } = require("express-validator");
 const authMiddleware = require("../middleware/authMiddleware");
+const { registerUser, loginUser, getUserProfile, getAllUsers } = require("../controllers/userController"); 
 
 const router = express.Router();
+
+
+router.get("/", getAllUsers);
+
+ 
 
 // **Register Route**
 router.post(

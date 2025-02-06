@@ -21,7 +21,9 @@ exports.registerUser = async (req, res) => {
 
     // Generate user_id and role based on prefix
     let role, user_id;
-    const userCount = (await User.count()) + 1;
+    const role = "guest"; // Default role is guest unless changed by admin
+const userCount = (await User.count()) + 1;
+const user_id = `guest${userCount.toString().padStart(4, "0")}`;
 
     if (email.startsWith("st")) {
       user_id = `st${userCount.toString().padStart(4, "0")}`;
@@ -96,6 +98,15 @@ exports.getUserProfile = async (req, res) => {
     }
 
     res.json(user);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll(); // Fetch all fields, including passwords
+    res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
