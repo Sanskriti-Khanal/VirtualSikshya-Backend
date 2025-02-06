@@ -1,8 +1,7 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require("../database/connection");
-const { User, createUser, findUserByEmail, findUserById } = require("../model/User");
+const sequelize = require("../database/connection"); // ✅ Ensure correct DB connection
 
-
+// Define User Model
 const User = sequelize.define("User", {
   user_id: {
     type: DataTypes.STRING,
@@ -32,18 +31,14 @@ const User = sequelize.define("User", {
   },
 });
 
-// User Functions
-const createUser = async (name, email, hashedPassword, role, user_id) => {
+// ✅ Properly export User model and helper functions
+module.exports ={User} ;
+module.exports.createUser = async (name, email, hashedPassword, role, user_id) => {
   return await User.create({ name, email, password: hashedPassword, role, user_id });
 };
-
-const findUserByEmail = async (email) => {
+module.exports.findUserByEmail = async (email) => {
   return await User.findOne({ where: { email } });
 };
-
-const findUserById = async (id) => {
+module.exports.findUserById = async (id) => {
   return await User.findByPk(id);
 };
-
-// Export everything correctly
-module.exports = { User, createUser, findUserByEmail, findUserById };

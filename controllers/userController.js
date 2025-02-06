@@ -1,7 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
-const User = require("../model/User");
+const { User, createUser, findUserByEmail, findUserById } = require("../model/User");
 
 // **Register a New User**
 exports.registerUser = async (req, res) => {
@@ -14,44 +14,35 @@ exports.registerUser = async (req, res) => {
 
   try {
     // Check if the user already exists
-    const existingUser = await User.findOne({ where: { email } });
+    const existingUser = await findUserByEmail(email);
     if (existingUser) {
       return res.status(400).json({ error: "User already exists" });
     }
 
-    // Generate user_id and role based on prefix
-    // let role, user_id;
-    // const userCount = (await User.count()) + 1;
-    const role = "guest"; // Default role is guest unless changed by admin
-    const userCount = (await User.count()) + 1;
-    const user_id = `guest${userCount.toString().padStart(4, "0")}`;
-  
+    // Default role is guest unless prefix exists
+    let role = "guest";
+    const userCount = await User.count();
+    const nextUserNumber = userCount ? userCount + 1 : 1;
+
+    // ✅ Declare `user_id` before using it
+    let user_id = `guest${nextUserNumber.toString().padStart(4, "0")}`;
 
     if (email.startsWith("st")) {
-      user_id = `st${userCount.toString().padStart(4, "0")}`;
+      user_id = `st${nextUserNumber.toString().padStart(4, "0")}`;
       role = "student";
     } else if (email.startsWith("ta")) {
-      user_id = `ta${userCount.toString().padStart(4, "0")}`;
+      user_id = `ta${nextUserNumber.toString().padStart(4, "0")}`;
       role = "teacher";
     } else if (email.startsWith("ad")) {
       user_id = `ad0001`; // Only one admin
       role = "admin";
-    } else {
-      user_id = `guest${userCount.toString().padStart(4, "0")}`;
-      role = "guest";
     }
 
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create new user
-    const newUser = await User.create({
-      user_id,
-      name,
-      email,
-      password: hashedPassword,
-      role,
-    });
+    const newUser = await createUser(name, email, hashedPassword, role, user_id);
 
     res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (err) {
@@ -59,12 +50,13 @@ exports.registerUser = async (req, res) => {
   }
 };
 
+
 // **User Login**
 exports.loginUser = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await findUserByEmail(email);
 
     if (!user) {
       return res.status(400).json({ error: "Invalid credentials" });
@@ -88,26 +80,30 @@ exports.loginUser = async (req, res) => {
   }
 };
 
-// **Get User Profile (Optional)**
+// **Get User Profile**
 exports.getUserProfile = async (req, res) => {
   try {
-    const user = await User.findByPk(req.user.user_id, {
-      attributes: ["user_id", "name", "email", "role"],
-    });
+    const user = await findUserById(req.user.user_id);
 
     if (!user) {
       return res.status(404).json({ error: "User not found" });
     }
 
-    res.json(user);
+    res.json({
+      user_id: user.user_id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+    });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+// **Get All Users**
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll(); // Fetch all fields, including passwords
+    const users = await User.findAll({ attributes: ["user_id", "name", "email", "role"] }); // Exclude passwords
     res.json(users);
   } catch (err) {
     res.status(500).json({ error: err.message });
