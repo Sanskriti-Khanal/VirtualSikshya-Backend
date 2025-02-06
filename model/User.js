@@ -1,5 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../database/connection");
+const { User, createUser, findUserByEmail, findUserById } = require("../model/User");
+
 
 const User = sequelize.define("User", {
   user_id: {
@@ -26,7 +28,22 @@ const User = sequelize.define("User", {
   role: {
     type: DataTypes.ENUM("admin", "student", "teacher", "guest"),
     allowNull: false,
+    defaultValue: "guest",
   },
 });
 
-module.exports = User;
+// User Functions
+const createUser = async (name, email, hashedPassword, role, user_id) => {
+  return await User.create({ name, email, password: hashedPassword, role, user_id });
+};
+
+const findUserByEmail = async (email) => {
+  return await User.findOne({ where: { email } });
+};
+
+const findUserById = async (id) => {
+  return await User.findByPk(id);
+};
+
+// Export everything correctly
+module.exports = { User, createUser, findUserByEmail, findUserById };

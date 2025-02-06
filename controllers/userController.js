@@ -20,10 +20,12 @@ exports.registerUser = async (req, res) => {
     }
 
     // Generate user_id and role based on prefix
-    let role, user_id;
+    // let role, user_id;
+    // const userCount = (await User.count()) + 1;
     const role = "guest"; // Default role is guest unless changed by admin
-const userCount = (await User.count()) + 1;
-const user_id = `guest${userCount.toString().padStart(4, "0")}`;
+    const userCount = (await User.count()) + 1;
+    const user_id = `guest${userCount.toString().padStart(4, "0")}`;
+  
 
     if (email.startsWith("st")) {
       user_id = `st${userCount.toString().padStart(4, "0")}`;
