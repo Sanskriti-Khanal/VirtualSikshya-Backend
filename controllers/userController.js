@@ -24,7 +24,7 @@ exports.registerUser = async (req, res) => {
     const userCount = await User.count();
     const nextUserNumber = userCount ? userCount + 1 : 1;
 
-    // ✅ Declare `user_id` before using it
+    //  Declare `user_id` before using it
     let user_id = `guest${nextUserNumber.toString().padStart(4, "0")}`;
 
     if (email.startsWith("st")) {
@@ -53,32 +53,45 @@ exports.registerUser = async (req, res) => {
 
 // **User Login**
 exports.loginUser = async (req, res) => {
+  console.log("Received login request:", req.body); // Debugging
+  
   const { email, password } = req.body;
+  
+  if (!email || !password) {
+    console.log("Missing email or password");
+    return res.status(400).json({ error: "Email and password are required" });
+  }
 
   try {
     const user = await findUserByEmail(email);
 
     if (!user) {
+      console.log("User not found:", email);
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
+      console.log("Invalid password for:", email);
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
     // Generate JWT Token
     const token = jwt.sign(
       { user_id: user.user_id, role: user.role },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET || "fallback_secret",
       { expiresIn: "24h" }
     );
 
-    res.json({ token, role: user.role, user_id: user.user_id });
+    console.log("Login successful:", email);
+    res.json({ token, role: user.role, user_id: user.user_id , name: user.name});
+
   } catch (err) {
+    console.error("Login error:", err.message);
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // **Get User Profile**
 exports.getUserProfile = async (req, res) => {

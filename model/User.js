@@ -37,7 +37,10 @@ module.exports.createUser = async (name, email, hashedPassword, role, user_id) =
   return await User.create({ name, email, password: hashedPassword, role, user_id });
 };
 module.exports.findUserByEmail = async (email) => {
-  return await User.findOne({ where: { email } });
+  return await User.findOne({ where: { email } ,
+    attributes: ["user_id", "name", "email", "password", "role"] 
+  });
+
 };
 module.exports.findUserById = async (id) => {
   return await User.findByPk(id);
