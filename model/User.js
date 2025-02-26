@@ -1,47 +1,31 @@
-const { DataTypes } = require("sequelize");
-const sequelize = require("../database/connection"); // ✅ Ensure correct DB connection
+const { Sequelize, DataTypes } = require("sequelize");
+const sequelize = require("../database/db"); // Import your Sequelize instance
 
-// Define User Model
-const User = sequelize.define("User", {
-  user_id: {
+const Course = sequelize.define("Course", {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+  },
+  title: {
     type: DataTypes.STRING,
-    unique: true,
     allowNull: false,
   },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true,
   },
-  email: {
-    type: DataTypes.STRING,
-    unique: true,
+  teacher_id: {
+    type: DataTypes.INTEGER,
     allowNull: false,
-    validate: {
-      isEmail: true,
+    references: {
+      model: "users", // name of Target model (the table name, typically lowercase and pluralized)
+      key: "id",
     },
   },
-  password: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  role: {
-    type: DataTypes.ENUM("admin", "student", "teacher", "guest"),
-    allowNull: false,
-    defaultValue: "guest",
-  },
+}, {
+  timestamps: true, // Automatically adds createdAt and updatedAt
+  tableName: "courses", // Explicit table name in your database
 });
 
-// ✅ Properly export User model and helper functions
-module.exports ={User} ;
-module.exports.createUser = async (name, email, hashedPassword, role, user_id) => {
-  return await User.create({ name, email, password: hashedPassword, role, user_id });
-};
-module.exports.findUserByEmail = async (email) => {
-  return await User.findOne({ where: { email } ,
-    attributes: ["user_id", "name", "email", "password", "role"] 
-  });
-
-};
-module.exports.findUserById = async (id) => {
-  return await User.findByPk(id);
-};
+module.exports = Course;

@@ -1,40 +1,51 @@
-
+// Initialization
 const express = require("express");
-const sequelize = require("./database/connection");
 const cors = require("cors");
-const User = require("./model/User");
-const userRoutes = require("./routes/userRoutes");
-require("dotenv").config();
-// const routineRoutes = require("./routes/routineRoutes");
+const bodyParser = require("body-parser");
+const dotenv = require("dotenv");
+const sequelize = require("./database/db"); // Import Sequelize connection
 
+const userRoute = require("./routes/userRoute");
+
+// Load environment variables
+dotenv.config();
+
+// Creating a Server
 const app = express();
-// Middleware to parse JSON bodies
+
+// Creating a Port
+const PORT = process.env.PORT || 8080;
+
+// Middleware
 app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// Function to get current Date & Time
+const getCurrentDateTime = () => {
+    const now = new Date();
+    return now.toLocaleString(); // Format: MM/DD/YYYY, HH:MM:SS AM/PM
+};
+
+// Test Route - Shows Current Date & Time
+app.get("/", (req, res) => {
+    res.send(`Current Date & Time: ${getCurrentDateTime()}`);
+});
+
+// Serve Uploaded Images as Static Files
+app.use("/uploads", express.static("uploads"));
 
 // Routes
-// app.use('/auth', authRoutes);
-// app.use('/users', userRoutes);
+app.use("/users", userRoute);
 
-
-app.use("/api/users", userRoutes);
-// app.use("/api/routines", routineRoutes);
-// app.use('/students', studentRoutes);//
-// app.use('/teachers', teacherRoutes);
-// app.use('/courses', courseRoutes);
-
-// Sync Sequelize models with the database
-sequelize
-  .sync({ force: false }) // Set `force: true` to drop and recreate tables
-  .then(() => {
-    console.log('Database synced successfully....................');
-  })
-  .catch((error) => {
-    console.error('Error syncing database:', error);
-  });
-
-// Start the server
-const PORT = process.env.PORT || 3001;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}.....................`);
-});
+// Sync Database and Start Server
+sequelize.sync()
+    .then(() => {
+        console.log("Database synchronized successfully...............");
+        app.listen(PORT, () => {
+            console.log(`Server running on PORT ${PORT}......................`);
+        });
+    })
+    .catch((error) => {
+        console.error("Database synchronization failed:", error);
+    });
